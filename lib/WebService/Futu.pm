@@ -20,7 +20,7 @@ Version 0.01
 
 =cut
 
-our $VERSION = '0.01';
+our $VERSION = '0.02';
 
 
 =head1 SYNOPSIS
@@ -77,16 +77,16 @@ Example:
 
 sub new {
     my $class = shift;
-    my $hash = shift;
+    my %hash = @_;
 	
-    unless ( (defined($hash->{'user'}) or defined($hash->{'id'})) && defined($hash->{'pass'}) ) {
+    unless ( (defined($hash{'user'}) or defined($hash{'id'})) && defined($hash{'pass'}) ) {
         die "Must define user and pass to initialise object";
     }
 	my $self;
-	$self->{_user} = $hash->{'user'} if exists $hash->{'user'};
-	$self->{_id} = $hash->{'id'} if exists $hash->{'id'};
-	$self->{_pass} = $hash->{'pass'};
-	$self->{_url} = exists $hash->{'url'} ? $hash->{'url'} : 'https://www.futu.cz';
+	$self->{_user} = $hash{'user'} if exists $hash{'user'};
+	$self->{_id} = $hash{'id'} if exists $hash{'id'};
+	$self->{_pass} = $hash{'pass'};
+	$self->{_url} = exists $hash{'url'} ? $hash{'url'} : 'https://www.futu.cz';
 	
     return bless($self, $class);
 }
@@ -152,6 +152,21 @@ $content is used for sending content.
 sub perform_put {
     my ($self, @other) = @_;
 	return $self->_perform_auth('PUT', @other);
+}
+
+=item perform_delete($content)
+
+Perform delete on the server.
+Automatically request authentication token.
+$content is used for sending content.
+
+ my $personal = $self->perform_delete('/api/transaction/123', $content);
+ 
+=cut
+
+sub perform_delete {
+    my ($self, @other) = @_;
+	return $self->_perform_auth('DELETE', @other);
 }
 
 sub _perform_auth {
@@ -226,7 +241,7 @@ sub _perform {
 	}
 
     my $body = $ua->request($req);
-	print STDERR Dumper($body);
+	#print STDERR Dumper($body);
 
 	return $body;
 }
